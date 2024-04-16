@@ -5,6 +5,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import ImagePicker from 'react-native-image-picker';
 const Home =() => {
    const [image, setImage] = useState(null);
+   const [imageuri, setImageuri] = useState(null);
     const [animating, setAnimating] = useState(false);
     const [results, setResults] = useState({});
      
@@ -21,6 +22,7 @@ const Home =() => {
       } else {
 
         setImage(res);
+         setImageuri(res.assets[0].uri);
       }
     });
   };
@@ -37,6 +39,9 @@ const Home =() => {
         console.log('ImagePicker Error: ', res.error);
       }  else {
         setImage(res);
+       
+        console.log("image uri is",imageuri);
+        setImageuri(res.assets[0].uri);
       }
     });
   };
@@ -49,11 +54,11 @@ const Home =() => {
     };
 
     Alert.alert('Select Image', '', [
-      {
-        text: 'cancel',
-        onPress: console.log('cancel'),
-        style: 'cancel',
-      },
+       {
+          text: 'cancel',
+          style:'cancel',
+
+       },
       {
         text: 'Take a photo',
         onPress: () => camera(options),
@@ -82,7 +87,7 @@ const Home =() => {
             : image.uri.replace('file://', '')
       });
 
-     console.log(image);
+     console.log("image",image);
       fetch('url', {
        method: 'POST',
        headers: {
@@ -103,7 +108,7 @@ const Home =() => {
           setAnimating(false);
           console.log(data);
           // display results
-
+          
           setResults(data);
         })
         .catch(err => {
@@ -121,31 +126,37 @@ const Home =() => {
 
 
   return (
-
     <ScrollView style={styles.container} contentContainerStyle={{flexGrow: 1}}>
       <View style={{flex: 19}}>
         <View style={styles.placeholderView}>
-            <Image style={styles.placeholder} source={image == null? require('../images/placeholder_image.jpeg'):{uri:image.uri}}/>
-          </View>
+          <Image
+            style={styles.placeholder}
+            source={
+              image
+                ? {uri: imageuri}
+                : require('../images/placeholder_image.jpeg')
+            }
+          />
+        </View>
 
         <TouchableOpacity style={styles.button} onPress={selectFile}>
           <Text style={styles.text}>LOAD IMAGE</Text>
         </TouchableOpacity>
         <View style={{alignItems: 'center'}}>
-          <TouchableOpacity style={styles.button_2} onPress={scan} >
+          <TouchableOpacity style={styles.button_2} onPress={scan}>
             <Text style={styles.text}>SCAN</Text>
           </TouchableOpacity>
 
-          <ActivityIndicator
-          animating ={animating}
+          {/* <ActivityIndicator
+            animating={animating}
             style={{marginTop: 20, marginBottom: 20}}
             size="large"
             color="#fff"
-          />
-
-          </View>
-           <View ><Results results={results} /></View>
-        
+          /> */}
+        </View>
+        <View>
+          <Results results={results} />
+        </View>
       </View>
     </ScrollView>
   );
@@ -169,11 +180,11 @@ const styles = StyleSheet.create({
   },
   button_2: {
     backgroundColor: '#b61500',
-    marginTop: 80,
+    marginTop: 50,
     borderWidth: 1,
     padding: 8,
     height: 35,
-    width: 70,
+    width: 80,
     alignItems: 'center',
     borderRadius: 20,
     marginRight: 15,
@@ -196,11 +207,11 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   placeholder: {
-    width: 200,
-    height: 200,
+    width: 330,
+    height: 250,
     marginTop: 60,
     marginBottom: 0,
-    backgroundColor: 'transparent',
+   
   },
   placeholderView: {
     justifyContent: 'center',
